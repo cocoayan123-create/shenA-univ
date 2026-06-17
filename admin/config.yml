@@ -1,0 +1,33 @@
+# 深A女性向大学 — 校园动态后台（Decap CMS）
+#
+# 部署后把下面 repo 改成你的 GitHub 仓库（用户名/仓库名）。
+# 本地试用：先在站点根目录跑 `npx decap-server`，再把下面的 local_backend 一行取消注释。
+
+backend:
+  name: git-gateway
+  branch: main
+
+# local_backend: true                 # ← 仅本地测试时取消注释（配合 npx decap-server）
+
+media_folder: "uploads"
+public_folder: "/uploads"
+locale: "zh_Hans"
+
+collections:
+  - name: "site"
+    label: "校园动态"
+    files:
+      - name: "news"
+        label: "校园动态列表"
+        file: "content/news.json"
+        description: "在这里增删校园动态，标题可附一条链接。保存后自动发布到官网。"
+        fields:
+          - label: "动态条目"
+            name: "items"
+            widget: "list"
+            label_singular: "一条动态"
+            summary: "{{fields.date}} — {{fields.title}}"
+            fields:
+              - { label: "日期", name: "date", widget: "string", hint: "例：06.17" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "链接（可留空）", name: "link", widget: "string", required: false, hint: "资料 / 详情 / 外链 URL，留空则不可点" }
