@@ -15,8 +15,12 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="入学申请表 · 深A女性向大学">
 <meta name="twitter:description" content="填好报考志愿与宣言，一键生成可分享的入学申请表。">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="assets/tabler/tabler-icons.min.css">
 <link rel="stylesheet" href="assets/style.css">
+<style>
+.gen-card{background-image:url("assets/wm.svg");background-repeat:no-repeat;background-position:center 57%;background-size:58%}
+.gen-card.shoot .pill:not(.on){display:none}
+</style>
 </head>
 <body>
 
@@ -45,7 +49,7 @@
       <div class="gen-title">本科入学申请表<span>UNDERGRADUATE APPLICATION · MMXXVI</span></div>
       <div class="field"><label>考生昵称　Applicant</label><div class="ce" contenteditable="true" data-ph="点此输入你的昵称"></div></div>
       <div class="field"><label>报考系别　Department</label><div class="pills">
-        <span class="pill" data-group="dept">男喘系</span><span class="pill" data-group="dept">ASMR声控系</span><span class="pill" data-group="dept">声音工程系</span><span class="pill" data-group="dept">实时陪伴系</span><span class="pill" data-group="dept">AI系</span><span class="pill" data-group="dept">台本创作系</span><span class="pill" data-group="dept">视觉设计系</span><span class="pill" data-group="dept">运营系</span><span class="pill" data-group="dept">理论鉴赏系</span>
+        <span class="pill on" data-group="dept">男喘系</span><span class="pill" data-group="dept">ASMR声控系</span><span class="pill" data-group="dept">声音工程系</span><span class="pill" data-group="dept">实时陪伴系</span><span class="pill" data-group="dept">AI系</span><span class="pill" data-group="dept">台本创作系</span><span class="pill" data-group="dept">视觉设计系</span><span class="pill" data-group="dept">运营系</span><span class="pill" data-group="dept">理论鉴赏系</span>
       </div></div>
       <div class="field"><label>声线类型自评　Voice type</label><div class="pills">
         <span class="pill" data-group="tone">清冷</span><span class="pill" data-group="tone">低哑</span><span class="pill" data-group="tone">温润</span><span class="pill" data-group="tone">痞坏</span><span class="pill" data-group="tone">奶狗</span><span class="pill" data-group="tone">病娇</span>
@@ -66,7 +70,7 @@
 
 <footer><div class="wrap"><div class="fbar"><span>深圳 · 声学楼</span><a href="https://x.com/AlbertKwongonly" target="_blank" rel="noopener">X @AlbertKwongonly</a><a href="mailto:cocoayan123@gmail.com">cocoayan123@gmail.com</a></div><div class="copy">© MMXXVI 深A女性向大学</div></div></footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="assets/vendor/html2canvas.min.js"></script>
 <script src="assets/courses.js"></script>
 <script src="assets/app.js"></script>
 </body>
