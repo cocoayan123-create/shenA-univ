@@ -1,6 +1,7 @@
 /* 深A女性向大学 — 站点脚本 */
 (function(){
   'use strict';
+  var I=window.SA_I18N||{};
 
   /* ---------- 星座 → 元素学院 ---------- */
   function getSign(m,d){var S=[['摩羯',1,19],['水瓶',2,18],['双鱼',3,20],['白羊',4,19],['金牛',5,20],['双子',6,21],['巨蟹',7,22],['狮子',8,22],['处女',9,22],['天秤',10,23],['天蝎',11,21],['射手',12,21]];return d<=S[m-1][2]?S[m-1][0]:S[m%12][0];}
@@ -16,7 +17,7 @@
   /* ---------- 存图（生成 +1，序号回填到卡片） ---------- */
   function pad(n){n=String(n);while(n.length<5)n='0'+n;return n;}
   function saveCard(card,filename,opts){
-    if(typeof html2canvas==='undefined'){alert('图片库还在加载，稍等再点');return;}
+    if(typeof html2canvas==='undefined'){alert(I.libLoading||'图片库还在加载，稍等再点');return;}
     function shoot(){
       card.classList.add('shoot');
       var bg=getComputedStyle(card).backgroundColor||'#F5F1EA';
@@ -24,7 +25,7 @@
         card.classList.remove('shoot');
         var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
         try{localStorage.setItem('sa_gen','1');}catch(e){}
-      }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
+      }).catch(function(){card.classList.remove('shoot');alert(I.genFail||'生成失败，再试一次');});
     }
     if(opts&&opts.kind&&window.SAGen){
       window.SAGen(opts.kind,function(seq,hrank){
@@ -48,29 +49,29 @@
   /* ---------- 生日分院 ---------- */
   function initSorting(root){
     var nick=root.querySelector('[data-sort=nick]'),ys=root.querySelector('[data-sort=y]'),ms=root.querySelector('[data-sort=m]'),ds=root.querySelector('[data-sort=d]');
-    ys.appendChild(new Option('出生年',''));for(var y=2012;y>=1955;y--)ys.appendChild(new Option(y,y));
-    ms.appendChild(new Option('月',''));for(var mo=1;mo<=12;mo++)ms.appendChild(new Option(mo,mo));
-    ds.appendChild(new Option('日',''));for(var dd=1;dd<=31;dd++)ds.appendChild(new Option(dd,dd));
+    ys.appendChild(new Option(I.selYear||'出生年',''));for(var y=2012;y>=1955;y--)ys.appendChild(new Option(y,y));
+    ms.appendChild(new Option(I.selMonth||'月',''));for(var mo=1;mo<=12;mo++)ms.appendChild(new Option(mo,mo));
+    ds.appendChild(new Option(I.selDay||'日',''));for(var dd=1;dd<=31;dd++)ds.appendChild(new Option(dd,dd));
     var done=false,lastHouse='',lastHouseName='';
     function run(){
       var m=parseInt(ms.value,10),d=parseInt(ds.value,10);
-      if(!m||!d){alert('先选一下出生月、日');return;}
-      var nm=(nick.value||'').trim()||'某位新生';
-      var s=getSign(m,d),el=ELEM[s],h=HOUSE[el];lastHouse=el;lastHouseName=h.name;
+      if(!m||!d){alert(I.pickDate||'先选一下出生月、日');return;}
+      var nm=(nick.value||'').trim()||(I.freshman||'某位新生');
+      var s=getSign(m,d),el=ELEM[s],h=(I.HOUSE&&I.HOUSE[el])||HOUSE[el];lastHouse=el;lastHouseName=h.name;
       var pool=(window.SA_LINES&&window.SA_LINES[el])||[h.quote];
       var line=pool[Math.floor(Math.random()*pool.length)];
       root.querySelector('[data-dorm=hd]').style.background=h.color;
-      var cr=root.querySelector('[data-dorm=crest]');cr.style.background=h.color;cr.textContent=el;
+      var cr=root.querySelector('[data-dorm=crest]');cr.style.background=h.color;cr.textContent=(I.crest&&I.crest[el])||el;
       root.querySelector('[data-dorm=house]').textContent=h.name;
       root.querySelector('[data-dorm=en]').textContent=h.en;
-      root.querySelector('[data-dorm=sign]').textContent='「'+nm+'」 · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+s+'座';
+      root.querySelector('[data-dorm=sign]').textContent='「'+nm+'」 · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+(I.sign?(I.sign[s]||s):s+'座');
       root.querySelector('[data-dorm=q]').textContent='“'+line+'”';
       var ln=root.querySelector('[data-dorm=line]');ln.textContent=h.tag;ln.style.color=h.color;
       done=true;
     }
     root.querySelector('[data-sort=go]').addEventListener('click',run);
     var sv=root.querySelector('[data-sort=save]');
-    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png',{kind:'sorting',house:lastHouse,serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return '深A · 第 '+Number(s).toLocaleString()+' 位学员';},houseEl:root.querySelector('[data-dorm=hrank]'),houseFmt:function(n){return lastHouseName+' · 第 '+Number(n).toLocaleString()+' 名';}});});
+    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),I.sortFile||'深A女性向大学-分院结果.png',{kind:'sorting',house:lastHouse,serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return (I.stuPre||'深A · 第 ')+Number(s).toLocaleString()+(I.stuSuf||' 位学员');},houseEl:root.querySelector('[data-dorm=hrank]'),houseFmt:function(n){return lastHouseName+(I.rankMid||' · 第 ')+Number(n).toLocaleString()+(I.rankSuf||' 名');}});});
   }
 
   /* ---------- 入学申请书（叙事体，选项嵌进正文） ---------- */
@@ -81,7 +82,7 @@
     function pushNick(){setF('nick',(nick.value||'').trim()||'　　　');}
     nick.addEventListener('input',pushNick);
     var st=root.querySelector('[data-in=statement]');
-    if(st)st.addEventListener('input',function(){var v=(st.value||'').trim();var e=root.querySelector('[data-f=statement]');if(e)e.textContent=v?('自述 ｜ '+v):'';});
+    if(st)st.addEventListener('input',function(){var v=(st.value||'').trim();var e=root.querySelector('[data-f=statement]');if(e)e.textContent=v?((I.statePre||'自述 ｜ ')+v):'';});
     wirePills(root,'dept',function(v){setF('dept',v);});
     wirePills(root,'tone',function(v){setF('tone',v);});
     var stars=root.querySelectorAll('.ap-ctl .star');
@@ -89,17 +90,17 @@
       stars.forEach(function(x,j){x.classList.toggle('on',j<=i);});
       var n=i+1;setF('stars','★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n));
     });});
-    setF('dept','男喘系');setF('tone','　　');setF('stars','☆☆☆☆☆');pushNick();
+    setF('dept',I.deptDefault||'男喘系');setF('tone',I.toneDefault||'　　');setF('stars','☆☆☆☆☆');pushNick();
     root.querySelector('[data-save]').addEventListener('click',function(){
-      if(!(nick.value||'').trim()){alert('先填上你的昵称，再生成申请书');nick.focus();return;}
-      saveCard(card,'深A女性向大学-入学申请书.png',{kind:'apply',serialEl:root.querySelector('[data-no]'),fmt:function(s){return 'No. SA·MMXXVI·'+pad(s);}});
+      if(!(nick.value||'').trim()){alert(I.applyNickAlert||'先填上你的昵称，再生成申请书');nick.focus();return;}
+      saveCard(card,I.applyFile||'深A女性向大学-入学申请书.png',{kind:'apply',serialEl:root.querySelector('[data-no]'),fmt:function(s){return 'No. SA·MMXXVI·'+pad(s);}});
     });
     var rs=root.querySelector('[data-reset]');
     if(rs)rs.addEventListener('click',function(){
       nick.value='';if(st)st.value='';
       root.querySelectorAll('.ap-ctl .on').forEach(function(e){e.classList.remove('on');});
       var d0=root.querySelector('.ap-ctl [data-group=dept]');if(d0)d0.classList.add('on');
-      setF('dept','男喘系');setF('tone','　　');setF('stars','☆☆☆☆☆');setF('statement','');pushNick();
+      setF('dept',I.deptDefault||'男喘系');setF('tone',I.toneDefault||'　　');setF('stars','☆☆☆☆☆');setF('statement','');pushNick();
     });
   }
 
@@ -108,8 +109,8 @@
     wirePills(root,'odept',function(v){root.querySelector('[data-odept]').textContent=v;});
     root.querySelector('[data-save]').addEventListener('click',function(){
       var nm=root.querySelector('.ce');
-      if(nm&&!nm.textContent.trim()){alert('先填上你的昵称，再生成录取通知书');nm.focus();return;}
-      saveCard(root.querySelector('.gen-card'),'深A女性向大学-录取通知书.png',{kind:'offer',serialEl:root.querySelector('[data-ono]'),fmt:function(s){return '录取字第 '+pad(s)+' 号';}});
+      if(nm&&!nm.textContent.trim()){alert(I.offerNickAlert||'先填上你的昵称，再生成录取通知书');nm.focus();return;}
+      saveCard(root.querySelector('.gen-card'),I.offerFile||'深A女性向大学-录取通知书.png',{kind:'offer',serialEl:root.querySelector('[data-ono]'),fmt:function(s){return (I.offerNoPre||'录取字第 ')+pad(s)+(I.offerNoSuf||' 号');}});
     });
     root.querySelector('[data-reset]').addEventListener('click',function(){root.querySelectorAll('[contenteditable]').forEach(function(e){e.textContent='';});});
   }
