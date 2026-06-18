@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+.gitignore
+.assetsignore
+wrangler.jsonc
+netlify.toml
+netlify
+supabase
+README.md
