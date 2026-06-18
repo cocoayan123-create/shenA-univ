@@ -116,30 +116,29 @@
     });
     function refresh(){stats(c.id).then(function(s){paintCk(s.checkin_count);paintRate(s.rating_avg,s.rating_count);});}
     refresh();paintComments();
+    setInterval(function(){refresh();paintComments();},60000);
   }
 
-  /* ---------- 入学（在册学员实时计数） ---------- */
-  function enroll(cb){
-    var cached=ls('sa_no');
-    if(cached){if(cb)cb(cached);return;}
-    fetch(BASE+'enrollments?on_conflict=anon_id&select=seq',{method:'POST',headers:H({Prefer:'resolution=ignore-duplicates,return=representation'}),body:JSON.stringify({anon_id:anonId()})})
+  /* ---------- 生成计数（每次出图 +1，在册学员 = 生成总数） ---------- */
+  function gen(kind,cb){
+    fetch(BASE+'generations?select=seq',{method:'POST',headers:H({Prefer:'return=representation'}),body:JSON.stringify({kind:kind||'gen',anon_id:anonId()})})
       .then(function(r){return r.json();})
       .then(function(rows){
-        if(rows&&rows.length&&rows[0].seq!=null){lsSet('sa_no',String(rows[0].seq));if(cb)cb(String(rows[0].seq));return;}
-        return fetch(BASE+'enrollments?anon_id=eq.'+encodeURIComponent(anonId())+'&select=seq',{headers:H()})
-          .then(function(r){return r.json();}).then(function(rs){if(rs&&rs.length){lsSet('sa_no',String(rs[0].seq));if(cb)cb(String(rs[0].seq));}});
+        var seq=(rows&&rows[0]&&rows[0].seq)||null;
+        if(seq){var el=document.querySelector('[data-enrolled]');if(el)el.textContent=Number(seq).toLocaleString();}
+        if(cb)cb(seq);
       }).catch(function(){if(cb)cb(null);});
   }
-  window.SAEnroll=enroll;
+  window.SAGen=gen;
   function fillEnrolled(){
     var el=document.querySelector('[data-enrolled]');if(!el)return;
-    fetch(BASE+'rpc/enroll_count',{method:'POST',headers:H(),body:'{}'}).then(function(r){return r.json();}).then(function(n){
+    fetch(BASE+'rpc/gen_count',{method:'POST',headers:H(),body:'{}'}).then(function(r){return r.json();}).then(function(n){
       if(typeof n==='number')el.textContent=Number(n).toLocaleString();
     }).catch(function(){});
   }
 
   document.addEventListener('DOMContentLoaded',function(){
-    fillEnrolled();
+    fillEnrolled();setInterval(fillEnrolled,60000);
     var list=document.getElementById('course-list');if(list)renderList(list);
     var root=document.getElementById('course-root');if(root)renderDetail(root);
   });

@@ -13,19 +13,23 @@
     水:{name:'水象学院',en:'HOUSE OF WATER',color:'#3F4F9E',tag:'深情 · 沉浸 · 隐秘',quote:'为情节沦陷，收藏夹深不见底。'}
   };
 
-  /* ---------- 存图 ---------- */
-  function saveCard(card,filename){
+  /* ---------- 存图（生成 +1，序号回填到卡片） ---------- */
+  function pad(n){n=String(n);while(n.length<5)n='0'+n;return n;}
+  function saveCard(card,filename,opts){
     if(typeof html2canvas==='undefined'){alert('图片库还在加载，稍等再点');return;}
-    card.classList.add('shoot');
-    var bg=getComputedStyle(card).backgroundColor||'#F5F1EA';
-    html2canvas(card,{scale:2,backgroundColor:bg,useCORS:true,logging:false}).then(function(cv){
-      card.classList.remove('shoot');
-      var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
-      try{localStorage.setItem('sa_gen','1');}catch(e){}
-      if(window.SAEnroll){try{window.SAEnroll();}catch(e){}}
-    }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
+    function shoot(){
+      card.classList.add('shoot');
+      var bg=getComputedStyle(card).backgroundColor||'#F5F1EA';
+      html2canvas(card,{scale:2,backgroundColor:bg,useCORS:true,logging:false}).then(function(cv){
+        card.classList.remove('shoot');
+        var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
+        try{localStorage.setItem('sa_gen','1');}catch(e){}
+      }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
+    }
+    if(opts&&opts.kind&&window.SAGen){
+      window.SAGen(opts.kind,function(seq){if(seq&&opts.serialEl&&opts.fmt){opts.serialEl.textContent=opts.fmt(seq);}shoot();});
+    }else shoot();
   }
-  function rnd(){return Math.floor(1000+Math.random()*9000);}
 
   /* ---------- 单选胶囊 ---------- */
   function wirePills(scope,group,onPick){
@@ -58,40 +62,49 @@
       root.querySelector('[data-dorm=sign]').textContent='「'+nm+'」 · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+s+'座';
       root.querySelector('[data-dorm=q]').textContent='“'+line+'”';
       var ln=root.querySelector('[data-dorm=line]');ln.textContent=h.tag;ln.style.color=h.color;
-      if(window.SAEnroll){window.SAEnroll(function(no){var ne=root.querySelector('[data-dorm=no]');if(ne&&no)ne.textContent='深A · 第 '+Number(no).toLocaleString()+' 位学员';});}
       done=true;
     }
     root.querySelector('[data-sort=go]').addEventListener('click',run);
     var sv=root.querySelector('[data-sort=save]');
-    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png');});
+    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png',{kind:'sorting',serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return '深A · 第 '+Number(s).toLocaleString()+' 位学员';}});});
   }
 
-  /* ---------- 入学申请表 ---------- */
+  /* ---------- 入学申请书（叙事体，选项嵌进正文） ---------- */
   function initApply(root){
-    wirePills(root,'dept');wirePills(root,'tone');
-    var stars=root.querySelectorAll('.star');
-    stars.forEach(function(s,i){s.addEventListener('click',function(){stars.forEach(function(x,j){x.classList.toggle('on',j<=i);});});});
-    var ck=root.querySelector('[data-ck]');
-    if(ck)ck.addEventListener('click',function(){ck.classList.toggle('on');ck.innerHTML=ck.classList.contains('on')?'<i class="ti ti-check"></i>':'';});
-    function no(){root.querySelector('[data-no]').textContent='No. VS-MMXXVI-♀-'+rnd();}
-    no();
-    root.querySelector('[data-save]').addEventListener('click',function(){saveCard(root.querySelector('.gen-card'),'深A女性向大学-入学申请表.png');});
-    root.querySelector('[data-reset]').addEventListener('click',function(){
-      root.querySelectorAll('[contenteditable]').forEach(function(e){e.textContent='';});
-      root.querySelectorAll('.on').forEach(function(e){e.classList.remove('on');});
-      if(ck)ck.innerHTML='';no();
+    var card=root.querySelector('.gen-card');
+    function setF(name,val){var l=root.querySelectorAll('[data-f="'+name+'"]');for(var i=0;i<l.length;i++)l[i].textContent=val;}
+    var nick=root.querySelector('[data-in=nick]');
+    function pushNick(){setF('nick',(nick.value||'').trim()||'　　　');}
+    nick.addEventListener('input',pushNick);
+    var st=root.querySelector('[data-in=statement]');
+    if(st)st.addEventListener('input',function(){var v=(st.value||'').trim();var e=root.querySelector('[data-f=statement]');if(e)e.textContent=v?('自述 ｜ '+v):'';});
+    wirePills(root,'dept',function(v){setF('dept',v);});
+    wirePills(root,'tone',function(v){setF('tone',v);});
+    var stars=root.querySelectorAll('.ap-ctl .star');
+    stars.forEach(function(s,i){s.addEventListener('click',function(){
+      stars.forEach(function(x,j){x.classList.toggle('on',j<=i);});
+      var n=i+1;setF('stars','★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n));
+    });});
+    setF('dept','男喘系');setF('tone','　　');setF('stars','☆☆☆☆☆');pushNick();
+    root.querySelector('[data-save]').addEventListener('click',function(){
+      saveCard(card,'深A女性向大学-入学申请书.png',{kind:'apply',serialEl:root.querySelector('[data-no]'),fmt:function(s){return 'No. SA·MMXXVI·'+pad(s);}});
+    });
+    var rs=root.querySelector('[data-reset]');
+    if(rs)rs.addEventListener('click',function(){
+      nick.value='';if(st)st.value='';
+      root.querySelectorAll('.ap-ctl .on').forEach(function(e){e.classList.remove('on');});
+      var d0=root.querySelector('.ap-ctl [data-group=dept]');if(d0)d0.classList.add('on');
+      setF('dept','男喘系');setF('tone','　　');setF('stars','☆☆☆☆☆');setF('statement','');pushNick();
     });
   }
 
   /* ---------- 录取通知书 ---------- */
   function initOffer(root){
     wirePills(root,'odept',function(v){root.querySelector('[data-odept]').textContent=v;});
-    function no(){root.querySelector('[data-ono]').textContent='录取字第 '+rnd()+' 号';}
-    no();
-    root.querySelector('[data-save]').addEventListener('click',function(){saveCard(root.querySelector('.gen-card'),'深A女性向大学-录取通知书.png');});
-    root.querySelector('[data-reset]').addEventListener('click',function(){
-      root.querySelectorAll('[contenteditable]').forEach(function(e){e.textContent='';});no();
+    root.querySelector('[data-save]').addEventListener('click',function(){
+      saveCard(root.querySelector('.gen-card'),'深A女性向大学-录取通知书.png',{kind:'offer',serialEl:root.querySelector('[data-ono]'),fmt:function(s){return '录取字第 '+pad(s)+' 号';}});
     });
+    root.querySelector('[data-reset]').addEventListener('click',function(){root.querySelectorAll('[contenteditable]').forEach(function(e){e.textContent='';});});
   }
 
   /* ---------- 校园动态 ---------- */
