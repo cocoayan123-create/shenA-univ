@@ -29,11 +29,17 @@ async function handleApi(request, env, url) {
       return J(r ? r.n : 0);
     }
     if (p === '/api/gen') {
+      const house = body.house ? s(body.house, 8) : null;
       const r = await env.DB
-        .prepare('INSERT INTO generations (kind, anon_id) VALUES (?,?) RETURNING id')
-        .bind(s(body.kind || 'gen', 40), s(body.anon_id, 80))
+        .prepare('INSERT INTO generations (kind, anon_id, house) VALUES (?,?,?) RETURNING id')
+        .bind(s(body.kind || 'gen', 40), s(body.anon_id, 80), house)
         .first();
-      return J({ seq: r ? r.id : null });
+      let house_rank = null;
+      if (house) {
+        const hr = await env.DB.prepare('SELECT COUNT(*) AS n FROM generations WHERE house=?').bind(house).first();
+        house_rank = hr ? hr.n : null;
+      }
+      return J({ seq: r ? r.id : null, house_rank: house_rank });
     }
     if (p === '/api/stats') {
       const cid = s(body.cid, 80);

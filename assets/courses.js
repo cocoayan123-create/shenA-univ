@@ -140,14 +140,16 @@
   }
 
   /* ---------- 生成计数（每次出图 +1，在册学员 = 生成总数） ---------- */
-  function gen(kind,cb){
-    postJSON('gen',{kind:kind||'gen',anon_id:anonId()})
+  function gen(kind,cb,opts){
+    var b={kind:kind||'gen',anon_id:anonId()};
+    if(opts&&opts.house)b.house=opts.house;
+    postJSON('gen',b)
       .then(function(r){return r.json();})
       .then(function(d){
         var seq=(d&&d.seq)||null;
         if(seq)setEnrolled(seq);
-        if(cb)cb(seq);
-      }).catch(function(){if(cb)cb(null);});
+        if(cb)cb(seq,(d&&d.house_rank)||null);
+      }).catch(function(){if(cb)cb(null,null);});
   }
   window.SAGen=gen;
   function fillEnrolled(){

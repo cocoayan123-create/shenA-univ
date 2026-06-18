@@ -27,7 +27,11 @@
       }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
     }
     if(opts&&opts.kind&&window.SAGen){
-      window.SAGen(opts.kind,function(seq){if(seq&&opts.serialEl&&opts.fmt){opts.serialEl.textContent=opts.fmt(seq);}shoot();});
+      window.SAGen(opts.kind,function(seq,hrank){
+        if(seq&&opts.serialEl&&opts.fmt){opts.serialEl.textContent=opts.fmt(seq);}
+        if(hrank&&opts.houseEl&&opts.houseFmt){opts.houseEl.textContent=opts.houseFmt(hrank);}
+        shoot();
+      },{house:opts.house});
     }else shoot();
   }
 
@@ -47,12 +51,12 @@
     ys.appendChild(new Option('出生年',''));for(var y=2012;y>=1955;y--)ys.appendChild(new Option(y,y));
     ms.appendChild(new Option('月',''));for(var mo=1;mo<=12;mo++)ms.appendChild(new Option(mo,mo));
     ds.appendChild(new Option('日',''));for(var dd=1;dd<=31;dd++)ds.appendChild(new Option(dd,dd));
-    var done=false;
+    var done=false,lastHouse='',lastHouseName='';
     function run(){
       var m=parseInt(ms.value,10),d=parseInt(ds.value,10);
       if(!m||!d){alert('先选一下出生月、日');return;}
       var nm=(nick.value||'').trim()||'某位新生';
-      var s=getSign(m,d),el=ELEM[s],h=HOUSE[el];
+      var s=getSign(m,d),el=ELEM[s],h=HOUSE[el];lastHouse=el;lastHouseName=h.name;
       var pool=(window.SA_LINES&&window.SA_LINES[el])||[h.quote];
       var line=pool[Math.floor(Math.random()*pool.length)];
       root.querySelector('[data-dorm=hd]').style.background=h.color;
@@ -66,7 +70,7 @@
     }
     root.querySelector('[data-sort=go]').addEventListener('click',run);
     var sv=root.querySelector('[data-sort=save]');
-    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png',{kind:'sorting',serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return '深A · 第 '+Number(s).toLocaleString()+' 位学员';}});});
+    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png',{kind:'sorting',house:lastHouse,serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return '深A · 第 '+Number(s).toLocaleString()+' 位学员';},houseEl:root.querySelector('[data-dorm=hrank]'),houseFmt:function(n){return lastHouseName+' · 第 '+Number(n).toLocaleString()+' 名';}});});
   }
 
   /* ---------- 入学申请书（叙事体，选项嵌进正文） ---------- */
