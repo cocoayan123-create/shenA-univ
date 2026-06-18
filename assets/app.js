@@ -49,7 +49,7 @@
   /* ---------- 生日分院 ---------- */
   function initSorting(root){
     var nick=root.querySelector('[data-sort=nick]'),ys=root.querySelector('[data-sort=y]'),ms=root.querySelector('[data-sort=m]'),ds=root.querySelector('[data-sort=d]');
-    ys.appendChild(new Option(I.selYear||'出生年',''));for(var y=2012;y>=1955;y--)ys.appendChild(new Option(y,y));
+    ys.appendChild(new Option(I.selYear||'出生年',''));var _maxBY=(new Date().getFullYear()-18);for(var y=_maxBY;y>=1940;y--)ys.appendChild(new Option(y,y));
     ms.appendChild(new Option(I.selMonth||'月',''));for(var mo=1;mo<=12;mo++)ms.appendChild(new Option(mo,mo));
     ds.appendChild(new Option(I.selDay||'日',''));for(var dd=1;dd<=31;dd++)ds.appendChild(new Option(dd,dd));
     var done=false,lastHouse='',lastHouseName='';
@@ -64,8 +64,8 @@
       var cr=root.querySelector('[data-dorm=crest]');cr.style.background=h.color;cr.textContent=(I.crest&&I.crest[el])||el;
       root.querySelector('[data-dorm=house]').textContent=h.name;
       root.querySelector('[data-dorm=en]').textContent=h.en;
-      root.querySelector('[data-dorm=sign]').textContent='「'+nm+'」 · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+(I.sign?(I.sign[s]||s):s+'座');
-      root.querySelector('[data-dorm=q]').textContent='“'+line+'”';
+      root.querySelector('[data-dorm=sign]').textContent=(I.nickOpen!=null?I.nickOpen:'「')+nm+(I.nickClose!=null?I.nickClose:'」')+' · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+(I.sign?(I.sign[s]||s):s+'座');
+      root.querySelector('[data-dorm=q]').textContent=(I.quoteOpen||'“')+line+(I.quoteClose||'”');
       var ln=root.querySelector('[data-dorm=line]');ln.textContent=h.tag;ln.style.color=h.color;
       done=true;
     }
@@ -133,7 +133,7 @@
     }
     function load(){
       tries++;
-      fetch('content/news.json').then(function(r){return r.json();}).then(function(data){paint((data&&data.items)||[]);}).catch(function(){
+      fetch('/content/news.json').then(function(r){return r.json();}).then(function(data){paint((data&&data.items)||[]);}).catch(function(){
         if(tries<3){setTimeout(load,1000*tries);return;}
         list.innerHTML='<div class="news-item"><span class="news-t" style="color:var(--muted)">动态暂时没刷出来，网络好点再下拉刷新</span></div>';
       });

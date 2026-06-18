@@ -78,9 +78,20 @@ async function handleApi(request, env, url) {
     if (p === '/api/comment') {
       const txt = s(body.body, 500).trim();
       if (!txt) return J({ error: 'empty' }, 400);
+      // 拦链接 / 联系方式 / 引流话术
+      if (/https?:\/\/|www\.|\.(com|net|org|xyz|top|cn|io|me|cc|vip|link|shop|wang|info|tk|ml|app|site)\b|t\.me|telegram|wechat|[微薇][信芯]|[加扣][我vV]|q{1,2}群|qq[:：\s]*\d{5}/i.test(txt)) {
+        return J({ error: 'blocked' }, 400);
+      }
+      const anon = s(body.anon_id, 80);
+      // 频控：同一匿名 ID 60 秒内最多 3 条
+      const rc = await env.DB
+        .prepare("SELECT COUNT(*) AS n FROM comments WHERE anon_id=? AND created_at > strftime('%Y-%m-%dT%H:%M:%SZ','now','-60 seconds')")
+        .bind(anon)
+        .first();
+      if (rc && rc.n >= 3) return J({ error: 'rate' }, 429);
       await env.DB
         .prepare('INSERT INTO comments (course_id, body, anon_id) VALUES (?,?,?)')
-        .bind(s(body.course_id, 80), txt, s(body.anon_id, 80))
+        .bind(s(body.course_id, 80), txt, anon)
         .run();
       return J({ ok: true });
     }

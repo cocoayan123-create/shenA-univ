@@ -7,6 +7,22 @@
   function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
   function anonId(){var v=ls('sa_anon');if(!v){v='a'+Math.random().toString(36).slice(2)+Date.now().toString(36);lsSet('sa_anon',v);}return v;}
   function hasGen(){return ls('sa_gen')==='1';}
+  function ageGate(){
+    if(ls('sa_adult')==='1')return;
+    var t=(window.SA_I18N&&window.SA_I18N.age)||{};
+    var o=document.createElement('div');
+    o.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(28,18,42,.94);display:flex;align-items:center;justify-content:center;padding:24px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif';
+    o.innerHTML='<div style="max-width:340px;width:100%;background:#fbf9f4;border-radius:16px;padding:28px 24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.45)">'+
+      '<div style="font-size:26px;font-weight:700;letter-spacing:.04em;color:#C0453E">18+</div>'+
+      '<div style="font-family:Georgia,\'Songti SC\',serif;font-size:19px;color:#4E2A84;margin:12px 0 8px;font-weight:500">'+(t.title||'未成年止步')+'</div>'+
+      '<div style="font-size:13.5px;line-height:1.75;color:#4a4358;margin-bottom:20px">'+(t.body||'本站含女性向成人向音声相关内容，仅供年满 18 周岁人士访问。点击进入即代表你确认已年满 18 周岁。')+'</div>'+
+      '<button id="sa-ag-y" style="width:100%;background:#4E2A84;color:#f3eee2;border:0;border-radius:9px;padding:13px;font-size:15px;cursor:pointer;margin-bottom:9px">'+(t.yes||'我已年满 18 周岁 · 进入')+'</button>'+
+      '<button id="sa-ag-n" style="width:100%;background:transparent;color:#8a7fa0;border:1px solid #d6cab2;border-radius:9px;padding:11px;font-size:13.5px;cursor:pointer">'+(t.no||'离开')+'</button></div>';
+    document.body.appendChild(o);
+    var html=document.documentElement;html.style.overflow='hidden';
+    o.querySelector('#sa-ag-y').addEventListener('click',function(){lsSet('sa_adult','1');if(o.parentNode)o.parentNode.removeChild(o);html.style.overflow='';});
+    o.querySelector('#sa-ag-n').addEventListener('click',function(){location.href='https://www.bing.com';});
+  }
   function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function fmtDate(iso){try{var d=new Date(iso),p=function(n){return(n<10?'0':'')+n;};return (d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}catch(e){return '';}}
 
@@ -36,7 +52,7 @@
   function getComments(cid){return fetch(API+'comments?cid='+encodeURIComponent(cid)).then(function(r){return r.json();});}
   function postComment(cid,body){return postJSON('comment',{course_id:cid,body:body,anon_id:anonId()});}
 
-  function loadCourses(){return fetch('content/courses.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){return (d&&d.courses)||[];});}
+  function loadCourses(){return fetch('/content/courses.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){return (d&&d.courses)||[];});}
   function isLive(c){return !!(c.x_link&&String(c.x_link).trim());}
 
   /* ---------- 列表（男喘系页） ---------- */
@@ -132,8 +148,12 @@
       var t=(input.value||'').trim();
       if(t.length<1)return;
       if(t.length>500){alert('最多 500 字');return;}
+      if(!hasGen()){alert('发评论需先生成一张分享图解锁哦');return;}
       sendBtn.disabled=true;
-      postComment(c.id,t).then(function(){input.value='';sendBtn.disabled=false;paintComments();}).catch(function(){sendBtn.disabled=false;alert('发送失败，再试一次');});
+      postComment(c.id,t).then(function(r){
+        if(r&&r.ok===false){sendBtn.disabled=false;alert('评论没发出去：请勿包含链接或联系方式，也别发太频繁');return;}
+        input.value='';sendBtn.disabled=false;paintComments();
+      }).catch(function(){sendBtn.disabled=false;alert('发送失败，再试一次');});
     });
     function refresh(){stats(c.id).then(function(s){paintCk(s.checkin_count);paintRate(s.rating_avg,s.rating_count);});}
     livePoll(function(){refresh();paintComments();});
@@ -160,6 +180,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',function(){
+    ageGate();
     var nt=document.querySelector('.nav-toggle'),nm=document.querySelector('nav.main');
     if(nt&&nm)nt.addEventListener('click',function(){var o=nm.classList.toggle('open');nt.setAttribute('aria-expanded',o?'true':'false');});
     livePoll(fillEnrolled);

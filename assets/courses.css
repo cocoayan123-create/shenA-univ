@@ -27,7 +27,7 @@
 .crs-ck-hint a{color:var(--primary)}
 .crs-rate-h,.crs-cm-h{font-family:var(--sans);font-size:12px;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 .crs-stars{display:flex;gap:4px;font-size:26px;color:#cfc7dd;cursor:pointer}
-.crs-stars .crs-star{padding:7px;line-height:1}
+.crs-stars .crs-star{padding:9px;line-height:1}
 .crs-star.on{color:var(--accent)}
 .crs-rate-avg{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:7px}
 .crs-rate-avg b{color:var(--ink);font-size:15px}
