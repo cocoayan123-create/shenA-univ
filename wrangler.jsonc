@@ -1,8 +1,8 @@
 {
   // 深A女性向大学 — Cloudflare Workers 静态资源托管
   // 整个仓库根目录作为静态资源直接服务（资源层优先，干净 URL 行为不变）。
-  // 另带一个极薄的 Worker（worker.js）：仅用于每 3 天 cron 保活 Supabase；
-  // fetch 兜底未命中请求回退给资源层，正常页面不经过它。
+  // Worker（worker.js）接管 /api/*：课程互动 + 在册计数走 Cloudflare D1（同域、国内可达，
+  // 取代被墙的 supabase.co）。fetch 其余请求回退给资源层。
   "name": "shenauniv",
   "compatibility_date": "2025-01-01",
   "main": "worker.js",
@@ -10,7 +10,11 @@
     "directory": "./",
     "binding": "ASSETS"
   },
-  "triggers": {
-    "crons": ["0 6 */3 * *"]
-  }
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shenauniv",
+      "database_id": "005e57b6-6cd1-403a-84c6-6e0f21cc2c14"
+    }
+  ]
 }

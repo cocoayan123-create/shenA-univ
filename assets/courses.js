@@ -1,10 +1,8 @@
-/* 深A女性向大学 — 课程互动（Supabase 直连，公开 anon key + RLS 兜底） */
+/* 深A女性向大学 — 课程互动（同域 /api/*，后端 Cloudflare D1，国内可达无需 VPN） */
 (function(){
   'use strict';
-  var BASE='https://erzkhzuqcosdeqanqgwl.supabase.co/rest/v1/';
-  var KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVyemtoenVxY29zZGVxYW5xZ3dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3NDYwNzMsImV4cCI6MjA5NzMyMjA3M30.FSEne0MdCTWn6JSnqOCLMnUMwOpx9gLbIPs_AKvGh_Y';
-
-  function H(extra){var h={apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'};if(extra)for(var k in extra)h[k]=extra[k];return h;}
+  var API='/api/';
+  function postJSON(path,obj){return fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(obj||{})});}
   function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
   function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
   function anonId(){var v=ls('sa_anon');if(!v){v='a'+Math.random().toString(36).slice(2)+Date.now().toString(36);lsSet('sa_anon',v);}return v;}
@@ -32,11 +30,11 @@
     requestAnimationFrame(step);
   }
 
-  function stats(cid){return fetch(BASE+'rpc/course_stats',{method:'POST',headers:H(),body:JSON.stringify({cid:cid})}).then(function(r){return r.json();}).then(function(d){return (d&&d[0])||{checkin_count:0,comment_count:0,rating_count:0,rating_avg:null};});}
-  function checkin(cid){return fetch(BASE+'checkins?on_conflict=course_id,anon_id',{method:'POST',headers:H({Prefer:'resolution=ignore-duplicates,return=minimal'}),body:JSON.stringify({course_id:cid,anon_id:anonId()})});}
-  function rate(cid,stars){return fetch(BASE+'ratings?on_conflict=course_id,anon_id',{method:'POST',headers:H({Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({course_id:cid,anon_id:anonId(),stars:stars})});}
-  function getComments(cid){return fetch(BASE+'comments?select=body,created_at&course_id=eq.'+encodeURIComponent(cid)+'&order=created_at.desc&limit=200',{headers:H()}).then(function(r){return r.json();});}
-  function postComment(cid,body){return fetch(BASE+'comments',{method:'POST',headers:H({Prefer:'return=minimal'}),body:JSON.stringify({course_id:cid,body:body,anon_id:anonId()})});}
+  function stats(cid){return postJSON('stats',{cid:cid}).then(function(r){return r.json();}).then(function(d){return d||{checkin_count:0,comment_count:0,rating_count:0,rating_avg:null};});}
+  function checkin(cid){return postJSON('checkin',{course_id:cid,anon_id:anonId()});}
+  function rate(cid,stars){return postJSON('rate',{course_id:cid,anon_id:anonId(),stars:stars});}
+  function getComments(cid){return fetch(API+'comments?cid='+encodeURIComponent(cid)).then(function(r){return r.json();});}
+  function postComment(cid,body){return postJSON('comment',{course_id:cid,body:body,anon_id:anonId()});}
 
   function loadCourses(){return fetch('content/courses.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){return (d&&d.courses)||[];});}
   function isLive(c){return !!(c.x_link&&String(c.x_link).trim());}
@@ -143,10 +141,10 @@
 
   /* ---------- 生成计数（每次出图 +1，在册学员 = 生成总数） ---------- */
   function gen(kind,cb){
-    fetch(BASE+'generations?select=seq',{method:'POST',headers:H({Prefer:'return=representation'}),body:JSON.stringify({kind:kind||'gen',anon_id:anonId()})})
+    postJSON('gen',{kind:kind||'gen',anon_id:anonId()})
       .then(function(r){return r.json();})
-      .then(function(rows){
-        var seq=(rows&&rows[0]&&rows[0].seq)||null;
+      .then(function(d){
+        var seq=(d&&d.seq)||null;
         if(seq)setEnrolled(seq);
         if(cb)cb(seq);
       }).catch(function(){if(cb)cb(null);});
@@ -154,7 +152,7 @@
   window.SAGen=gen;
   function fillEnrolled(){
     if(!document.querySelector('[data-enrolled]'))return;
-    fetch(BASE+'rpc/gen_count',{method:'POST',headers:H(),body:'{}'}).then(function(r){return r.json();}).then(function(n){
+    fetch(API+'gen_count').then(function(r){return r.json();}).then(function(n){
       if(typeof n==='number')setEnrolled(n);
     }).catch(function(){});
   }
