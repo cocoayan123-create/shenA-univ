@@ -1,0 +1,9 @@
+{
+  // 深A女性向大学 — Cloudflare Workers 静态资源托管
+  // 纯静态站点：把整个仓库根目录作为静态资源直接服务，无需 Worker 脚本。
+  "name": "shenauniv",
+  "compatibility_date": "2025-01-01",
+  "assets": {
+    "directory": "./"
+  }
+}
