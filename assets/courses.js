@@ -12,6 +12,26 @@
   function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function fmtDate(iso){try{var d=new Date(iso),p=function(n){return(n<10?'0':'')+n;};return (d.getMonth()+1)+'.'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes());}catch(e){return '';}}
 
+  /* ---------- 实时同步：可见时每 POLL 拉一次，切回标签页/聚焦立即刷新 ---------- */
+  var POLL=7000;
+  function livePoll(fn){
+    fn();
+    setInterval(function(){if(!document.hidden)fn();},POLL);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden)fn();});
+    window.addEventListener('focus',function(){fn();});
+  }
+  /* 在册学员：数值变化时做一段缓动跳数，肉眼可见「在涨」 */
+  function setEnrolled(n){
+    var el=document.querySelector('[data-enrolled]');if(!el)return;
+    n=Number(n)||0;
+    var cur=parseInt(el.getAttribute('data-val')||'0',10)||0;
+    el.setAttribute('data-val',n);
+    if(n===cur){el.textContent=n.toLocaleString();return;}
+    var start=cur,diff=n-start,t0=null,dur=Math.min(1400,300+Math.abs(diff)*30);
+    function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);var e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;el.textContent=Math.round(start+diff*e).toLocaleString();if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+
   function stats(cid){return fetch(BASE+'rpc/course_stats',{method:'POST',headers:H(),body:JSON.stringify({cid:cid})}).then(function(r){return r.json();}).then(function(d){return (d&&d[0])||{checkin_count:0,comment_count:0,rating_count:0,rating_avg:null};});}
   function checkin(cid){return fetch(BASE+'checkins?on_conflict=course_id,anon_id',{method:'POST',headers:H({Prefer:'resolution=ignore-duplicates,return=minimal'}),body:JSON.stringify({course_id:cid,anon_id:anonId()})});}
   function rate(cid,stars){return fetch(BASE+'ratings?on_conflict=course_id,anon_id',{method:'POST',headers:H({Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({course_id:cid,anon_id:anonId(),stars:stars})});}
@@ -32,13 +52,16 @@
           '<div class="crs-card-title">'+esc(c.title)+'</div>'+
           '<div class="crs-card-meta" data-meta="'+esc(c.id)+'">'+(live?'…':'链接上线后开放打卡 / 评分')+'</div></a>';
       }).join('');
-      cs.forEach(function(c){
-        if(!isLive(c))return;
-        var m=el.querySelector('[data-meta="'+c.id+'"]');if(!m)return;
-        stats(c.id).then(function(s){
-          m.innerHTML='<i class="ti ti-flame"></i> '+s.checkin_count+' 打卡　<i class="ti ti-star"></i> '+(s.rating_avg!=null?s.rating_avg+'（'+s.rating_count+'）':'暂无评分');
-        }).catch(function(){m.textContent='';});
-      });
+      function refreshStats(){
+        cs.forEach(function(c){
+          if(!isLive(c))return;
+          var m=el.querySelector('[data-meta="'+c.id+'"]');if(!m)return;
+          stats(c.id).then(function(s){
+            m.innerHTML='<i class="ti ti-flame"></i> '+s.checkin_count+' 打卡　<i class="ti ti-star"></i> '+(s.rating_avg!=null?s.rating_avg+'（'+s.rating_count+'）':'暂无评分');
+          }).catch(function(){});
+        });
+      }
+      livePoll(refreshStats);
     }).catch(function(){el.innerHTML='<p style="color:var(--muted)">课程加载失败</p>';});
   }
 
@@ -115,8 +138,7 @@
       postComment(c.id,t).then(function(){input.value='';sendBtn.disabled=false;paintComments();}).catch(function(){sendBtn.disabled=false;alert('发送失败，再试一次');});
     });
     function refresh(){stats(c.id).then(function(s){paintCk(s.checkin_count);paintRate(s.rating_avg,s.rating_count);});}
-    refresh();paintComments();
-    setInterval(function(){refresh();paintComments();},60000);
+    livePoll(function(){refresh();paintComments();});
   }
 
   /* ---------- 生成计数（每次出图 +1，在册学员 = 生成总数） ---------- */
@@ -125,20 +147,22 @@
       .then(function(r){return r.json();})
       .then(function(rows){
         var seq=(rows&&rows[0]&&rows[0].seq)||null;
-        if(seq){var el=document.querySelector('[data-enrolled]');if(el)el.textContent=Number(seq).toLocaleString();}
+        if(seq)setEnrolled(seq);
         if(cb)cb(seq);
       }).catch(function(){if(cb)cb(null);});
   }
   window.SAGen=gen;
   function fillEnrolled(){
-    var el=document.querySelector('[data-enrolled]');if(!el)return;
+    if(!document.querySelector('[data-enrolled]'))return;
     fetch(BASE+'rpc/gen_count',{method:'POST',headers:H(),body:'{}'}).then(function(r){return r.json();}).then(function(n){
-      if(typeof n==='number')el.textContent=Number(n).toLocaleString();
+      if(typeof n==='number')setEnrolled(n);
     }).catch(function(){});
   }
 
   document.addEventListener('DOMContentLoaded',function(){
-    fillEnrolled();setInterval(fillEnrolled,60000);
+    var nt=document.querySelector('.nav-toggle'),nm=document.querySelector('nav.main');
+    if(nt&&nm)nt.addEventListener('click',function(){var o=nm.classList.toggle('open');nt.setAttribute('aria-expanded',o?'true':'false');});
+    livePoll(fillEnrolled);
     var list=document.getElementById('course-list');if(list)renderList(list);
     var root=document.getElementById('course-root');if(root)renderDetail(root);
   });

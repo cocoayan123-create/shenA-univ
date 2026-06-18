@@ -87,6 +87,7 @@
     });});
     setF('dept','男喘系');setF('tone','　　');setF('stars','☆☆☆☆☆');pushNick();
     root.querySelector('[data-save]').addEventListener('click',function(){
+      if(!(nick.value||'').trim()){alert('先填上你的昵称，再生成申请书');nick.focus();return;}
       saveCard(card,'深A女性向大学-入学申请书.png',{kind:'apply',serialEl:root.querySelector('[data-no]'),fmt:function(s){return 'No. SA·MMXXVI·'+pad(s);}});
     });
     var rs=root.querySelector('[data-reset]');
@@ -102,6 +103,8 @@
   function initOffer(root){
     wirePills(root,'odept',function(v){root.querySelector('[data-odept]').textContent=v;});
     root.querySelector('[data-save]').addEventListener('click',function(){
+      var nm=root.querySelector('.ce');
+      if(nm&&!nm.textContent.trim()){alert('先填上你的昵称，再生成录取通知书');nm.focus();return;}
       saveCard(root.querySelector('.gen-card'),'深A女性向大学-录取通知书.png',{kind:'offer',serialEl:root.querySelector('[data-ono]'),fmt:function(s){return '录取字第 '+pad(s)+' 号';}});
     });
     root.querySelector('[data-reset]').addEventListener('click',function(){root.querySelectorAll('[contenteditable]').forEach(function(e){e.textContent='';});});
