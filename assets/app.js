@@ -98,8 +98,8 @@
   function renderNews(){
     var list=document.getElementById('news-list');
     if(!list)return;
-    fetch('content/news.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(data){
-      var items=(data&&data.items)||[];
+    var tries=0;
+    function paint(items){
       if(!items.length){list.innerHTML='<div class="news-item"><span class="news-t" style="color:var(--muted)">暂无动态</span></div>';return;}
       list.innerHTML=items.map(function(n){
         var t=(n.title||'').replace(/</g,'&lt;');
@@ -109,7 +109,15 @@
         }
         return '<div class="news-item"><span class="news-date">'+dt+'</span><span class="news-t">'+t+'</span></div>';
       }).join('');
-    }).catch(function(){list.innerHTML='<div class="news-item"><span class="news-t" style="color:var(--muted)">动态加载失败</span></div>';});
+    }
+    function load(){
+      tries++;
+      fetch('content/news.json').then(function(r){return r.json();}).then(function(data){paint((data&&data.items)||[]);}).catch(function(){
+        if(tries<3){setTimeout(load,1000*tries);return;}
+        list.innerHTML='<div class="news-item"><span class="news-t" style="color:var(--muted)">动态暂时没刷出来，网络好点再下拉刷新</span></div>';
+      });
+    }
+    load();
   }
 
   /* ---------- 启动 ---------- */
