@@ -3,14 +3,14 @@
   'use strict';
 
   /* ---------- 星座 → 元素学院 ---------- */
-  var SIGNS=['白羊','金牛','双子','巨蟹','狮子','处女','天秤','天蝎','射手','摩羯','水瓶','双鱼'];
+  function getSign(m,d){var S=[['摩羯',1,19],['水瓶',2,18],['双鱼',3,20],['白羊',4,19],['金牛',5,20],['双子',6,21],['巨蟹',7,22],['狮子',8,22],['处女',9,22],['天秤',10,23],['天蝎',11,21],['射手',12,21]];return d<=S[m-1][2]?S[m-1][0]:S[m%12][0];}
   var ELEM={白羊:'火',狮子:'火',射手:'火',金牛:'土',处女:'土',摩羯:'土',
             双子:'风',天秤:'风',水瓶:'风',巨蟹:'水',天蝎:'水',双鱼:'水'};
   var HOUSE={
-    火:{name:'火象学院',en:'HOUSE OF FIRE',color:'#C0453E',quote:'爱要爱得轰轰烈烈，听就听最上头的。',line:'上头第一，矜持第二。'},
-    土:{name:'土象学院',en:'HOUSE OF EARTH',color:'#5C6E3A',quote:'音质细节差一点都不行，品质控的极致享受。',line:'挑剔到底，将就不了。'},
-    风:{name:'风象学院',en:'HOUSE OF AIR',color:'#2D7E8E',quote:'嗑 CP 当学问，什么新玩法都想试。',line:'样样都尝，CP 比正主还熟。'},
-    水:{name:'水象学院',en:'HOUSE OF WATER',color:'#3F4F9E',quote:'为情节沦陷，收藏夹深不见底。',line:'白天清水，深夜深海。'}
+    火:{name:'火象学院',en:'HOUSE OF FIRE',color:'#C0453E',tag:'热烈 · 直球 · 占有欲',quote:'爱要爱得轰轰烈烈，听就听最上头的。'},
+    土:{name:'土象学院',en:'HOUSE OF EARTH',color:'#5C6E3A',tag:'感官 · 考究 · 收藏控',quote:'音质细节差一点都不行，品质控的极致享受。'},
+    风:{name:'风象学院',en:'HOUSE OF AIR',color:'#2D7E8E',tag:'好奇 · 思辨 · 博爱',quote:'嗑 CP 当学问，什么新玩法都想试。'},
+    水:{name:'水象学院',en:'HOUSE OF WATER',color:'#3F4F9E',tag:'深情 · 沉浸 · 隐秘',quote:'为情节沦陷，收藏夹深不见底。'}
   };
 
   /* ---------- 存图 ---------- */
@@ -22,6 +22,7 @@
       card.classList.remove('shoot');
       var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
       try{localStorage.setItem('sa_gen','1');}catch(e){}
+      if(window.SAEnroll){try{window.SAEnroll();}catch(e){}}
     }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
   }
   function rnd(){return Math.floor(1000+Math.random()*9000);}
@@ -38,23 +39,31 @@
 
   /* ---------- 生日分院 ---------- */
   function initSorting(root){
-    var sel=root.querySelector('[data-sort=sign]');
-    SIGNS.forEach(function(s){sel.appendChild(new Option(s+'座',s));});
-    var sorted=false;
+    var nick=root.querySelector('[data-sort=nick]'),ys=root.querySelector('[data-sort=y]'),ms=root.querySelector('[data-sort=m]'),ds=root.querySelector('[data-sort=d]');
+    ys.appendChild(new Option('出生年',''));for(var y=2012;y>=1955;y--)ys.appendChild(new Option(y,y));
+    ms.appendChild(new Option('月',''));for(var mo=1;mo<=12;mo++)ms.appendChild(new Option(mo,mo));
+    ds.appendChild(new Option('日',''));for(var dd=1;dd<=31;dd++)ds.appendChild(new Option(dd,dd));
+    var done=false;
     function run(){
-      var s=sel.value,el=ELEM[s],h=HOUSE[el];
+      var m=parseInt(ms.value,10),d=parseInt(ds.value,10);
+      if(!m||!d){alert('先选一下出生月、日');return;}
+      var nm=(nick.value||'').trim()||'某位新生';
+      var s=getSign(m,d),el=ELEM[s],h=HOUSE[el];
+      var pool=(window.SA_LINES&&window.SA_LINES[el])||[h.quote];
+      var line=pool[Math.floor(Math.random()*pool.length)];
       root.querySelector('[data-dorm=hd]').style.background=h.color;
       var cr=root.querySelector('[data-dorm=crest]');cr.style.background=h.color;cr.textContent=el;
       root.querySelector('[data-dorm=house]').textContent=h.name;
       root.querySelector('[data-dorm=en]').textContent=h.en;
-      root.querySelector('[data-dorm=sign]').textContent=s+'座';
-      root.querySelector('[data-dorm=q]').textContent='“'+h.quote+'”';
-      var ln=root.querySelector('[data-dorm=line]');ln.textContent=h.line;ln.style.color=h.color;
-      sorted=true;
+      root.querySelector('[data-dorm=sign]').textContent='「'+nm+'」 · '+(ys.value?ys.value+'.':'')+m+'.'+d+' · '+s+'座';
+      root.querySelector('[data-dorm=q]').textContent='“'+line+'”';
+      var ln=root.querySelector('[data-dorm=line]');ln.textContent=h.tag;ln.style.color=h.color;
+      if(window.SAEnroll){window.SAEnroll(function(no){var ne=root.querySelector('[data-dorm=no]');if(ne&&no)ne.textContent='深A · 第 '+Number(no).toLocaleString()+' 位学员';});}
+      done=true;
     }
     root.querySelector('[data-sort=go]').addEventListener('click',run);
     var sv=root.querySelector('[data-sort=save]');
-    if(sv)sv.addEventListener('click',function(){if(!sorted)run();saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png');});
+    if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),'深A女性向大学-分院结果.png');});
   }
 
   /* ---------- 入学申请表 ---------- */

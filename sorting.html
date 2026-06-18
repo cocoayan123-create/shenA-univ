@@ -36,8 +36,10 @@
   <p class="sec-sub">戴上分院耳机，它听得出你属于哪一象。</p>
   <div data-widget="sorting">
     <div class="sort-ctl">
-      <label>选择你的星座</label>
-      <select data-sort="sign" aria-label="星座"></select>
+      <input data-sort="nick" type="text" maxlength="12" placeholder="昵称（印在卡上）" style="width:150px;font-family:var(--sans);font-size:14px;padding:8px 12px;border:.5px solid #d6cab2;border-radius:8px;background:#fff;color:var(--ink)">
+      <select data-sort="y" aria-label="出生年"></select>
+      <select data-sort="m" aria-label="月"></select>
+      <select data-sort="d" aria-label="日"></select>
       <button class="btn btn-purple" data-sort="go"><i class="ti ti-headphones"></i> 分院</button>
     </div>
     <div class="dorm">
@@ -46,7 +48,8 @@
         <div class="dorm-crest" data-dorm="crest">耳</div>
         <div class="dorm-house" data-dorm="house">分院耳机</div>
         <div class="dorm-en" data-dorm="en">SORTING HEADPHONES</div>
-        <div class="dorm-sign" data-dorm="sign">选好星座，戴上耳机</div>
+        <div class="dorm-sign" data-dorm="sign">填昵称生日，戴上耳机</div>
+        <div class="dorm-no" data-dorm="no" style="font-family:var(--sans);font-size:11px;letter-spacing:.12em;color:#a07d1e;margin-top:7px;min-height:13px"></div>
       </div>
       <div class="dorm-q" data-dorm="q">“它会听出你属于哪一象。”</div>
       <div class="dorm-line" data-dorm="line">—</div>
@@ -59,6 +62,8 @@
 <footer><div class="wrap"><div class="fbar"><span>深圳 · 声学楼</span><a href="https://x.com/AlbertKwongonly" target="_blank" rel="noopener">X @AlbertKwongonly</a><a href="mailto:cocoayan123@gmail.com">cocoayan123@gmail.com</a></div><div class="copy">© MMXXVI 深A女性向大学</div></div></footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="assets/sortlines.js"></script>
+<script src="assets/courses.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>
