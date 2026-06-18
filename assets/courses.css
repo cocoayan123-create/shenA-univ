@@ -1,0 +1,42 @@
+/* 课程列表卡片 */
+.crs-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}
+.crs-card{display:block;background:#fff;border:.5px solid #e3d9c6;border-left:3px solid #d8cdbf;border-radius:0 var(--radius) var(--radius) 0;padding:14px 16px;text-decoration:none;color:var(--ink);transition:border-color .15s}
+.crs-card.live{border-left-color:var(--accent)}
+.crs-card:hover{border-color:var(--primary)}
+.crs-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:8px}
+.crs-card-code{font-family:var(--mono,monospace);font-size:11px;letter-spacing:.08em;color:var(--muted)}
+.crs-badge{font-family:var(--sans);font-size:10px;letter-spacing:.06em;padding:2px 9px;border-radius:20px;background:#ece6f0;color:#6b6478;white-space:nowrap}
+.crs-badge.live{background:var(--accent);color:#34205a}
+.crs-card-title{font-size:16px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.crs-card-meta{font-family:var(--sans);font-size:12px;color:var(--muted)}
+.crs-card-meta .ti{font-size:14px;vertical-align:-2px;color:var(--accent)}
+
+/* 课程详情 */
+.crs-d-code{font-family:var(--mono,monospace);font-size:12px;letter-spacing:.1em;color:var(--accent)}
+.crs-d-title{font-size:26px;color:var(--primary);margin:6px 0 10px;font-weight:500}
+.crs-d-link{margin:8px 0 2px}
+.crs-sum{background:#f6f0e3;border-left:3px solid var(--accent);border-radius:0 var(--radius) var(--radius) 0;padding:13px 16px;margin:18px 0}
+.crs-sum-h{font-family:var(--sans);font-size:12px;letter-spacing:.1em;color:var(--primary);margin-bottom:6px}
+.crs-sum-h .ti{vertical-align:-2px}
+.crs-sum p{font-family:var(--sans);font-size:14px;line-height:1.85;color:#4a4358;margin:0}
+.crs-inter{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin:22px 0;padding:18px 0;border-top:.5px solid #e6dcc8;border-bottom:.5px solid #e6dcc8}
+.crs-ck-btn{font-family:var(--sans);font-size:14px;padding:11px 22px;border-radius:8px;border:1px solid var(--primary);background:var(--primary);color:#f3eee2;cursor:pointer}
+.crs-ck-btn[disabled]{cursor:default;opacity:.9}
+.crs-ck-btn.done{background:#efe7d6;color:var(--primary);border-color:var(--accent)}
+.crs-ck-hint{font-family:var(--sans);font-size:11.5px;color:var(--muted);margin-top:7px}
+.crs-ck-hint a{color:var(--primary)}
+.crs-rate-h,.crs-cm-h{font-family:var(--sans);font-size:12px;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.crs-stars{display:flex;gap:4px;font-size:24px;color:#cfc7dd;cursor:pointer}
+.crs-star.on{color:var(--accent)}
+.crs-rate-avg{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-top:7px}
+.crs-rate-avg b{color:var(--ink);font-size:15px}
+.crs-cm{margin-top:6px}
+.crs-cm-h{font-size:14px;color:var(--ink)}
+.crs-cm-form{display:flex;gap:10px;margin:10px 0 16px;align-items:flex-end}
+.crs-cm-form textarea{flex:1;min-height:46px;resize:vertical;font-family:var(--sans);font-size:14px;padding:10px 12px;border:.5px solid #d6cab2;border-radius:8px;background:#fff;color:var(--ink)}
+.crs-cm-item{padding:11px 0;border-bottom:.5px solid #ece3d3}
+.crs-cm-body{font-family:var(--sans);font-size:14px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.crs-cm-date{font-family:var(--mono,monospace);font-size:11px;color:var(--muted);margin-top:3px}
+.crs-cm-empty{font-family:var(--sans);font-size:13px;color:var(--muted);padding:10px 0}
+.crs-upcoming{font-family:var(--sans);font-size:14px;color:#6b6478;background:#f3f0e8;border-radius:var(--radius);padding:16px 18px;margin:18px 0}
+.crs-upcoming .ti{color:var(--accent);vertical-align:-2px}

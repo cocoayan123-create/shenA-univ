@@ -21,6 +21,7 @@
     html2canvas(card,{scale:2,backgroundColor:bg,useCORS:true,logging:false}).then(function(cv){
       card.classList.remove('shoot');
       var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
+      try{localStorage.setItem('sa_gen','1');}catch(e){}
     }).catch(function(){card.classList.remove('shoot');alert('生成失败，再试一次');});
   }
   function rnd(){return Math.floor(1000+Math.random()*9000);}

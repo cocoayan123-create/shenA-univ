@@ -31,3 +31,20 @@ collections:
               - { label: "日期", name: "date", widget: "string", hint: "例：06.17" }
               - { label: "标题", name: "title", widget: "string" }
               - { label: "链接（可留空）", name: "link", widget: "string", required: false, hint: "资料 / 详情 / 外链 URL，留空则不可点" }
+      - name: "courses"
+        label: "男喘系课程"
+        file: "content/courses.json"
+        description: "编辑男喘系课程。粘贴某课在 X 上的链接后，该课即『开课』，前端开放打卡 / 评分 / 评论；留空则显示『待开课』。"
+        fields:
+          - label: "课程"
+            name: "courses"
+            widget: "list"
+            label_singular: "一门课"
+            summary: "{{fields.code}} — {{fields.title}}"
+            fields:
+              - { label: "课程ID（请勿修改）", name: "id", widget: "string", hint: "互动数据（打卡/评分/评论）按此 ID 关联，改了会丢统计" }
+              - { label: "课程代码", name: "code", widget: "string", hint: "例：INTRO·101" }
+              - { label: "课名", name: "title", widget: "string" }
+              - { label: "X 链接（填了才开课）", name: "x_link", widget: "string", required: false, hint: "粘贴这门课在 X 上的完整链接；留空 = 待开课" }
+              - { label: "AI 总结", name: "summary", widget: "text" }
+              - { label: "状态", name: "status", widget: "hidden", default: "upcoming" }
