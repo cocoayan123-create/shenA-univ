@@ -1,9 +1,16 @@
 {
   // 深A女性向大学 — Cloudflare Workers 静态资源托管
-  // 纯静态站点：把整个仓库根目录作为静态资源直接服务，无需 Worker 脚本。
+  // 整个仓库根目录作为静态资源直接服务（资源层优先，干净 URL 行为不变）。
+  // 另带一个极薄的 Worker（worker.js）：仅用于每 3 天 cron 保活 Supabase；
+  // fetch 兜底未命中请求回退给资源层，正常页面不经过它。
   "name": "shenauniv",
   "compatibility_date": "2025-01-01",
+  "main": "worker.js",
   "assets": {
-    "directory": "./"
+    "directory": "./",
+    "binding": "ASSETS"
+  },
+  "triggers": {
+    "crons": ["0 6 */3 * *"]
   }
 }

@@ -4,6 +4,7 @@ node_modules
 .gitignore
 .assetsignore
 wrangler.jsonc
+worker.js
 netlify.toml
 netlify
 supabase
