@@ -25,7 +25,7 @@ window.SA_I18N = {
     'Acoustic Engineering': { label: 'TECHNICAL TRACK', pick: 'technical track', rate: 'technical rigour', chips: ['Recording', 'Mixing', 'Denoise', 'Mastering', 'Scoring', 'Foley'] },
     'Live Companionship': { label: 'PERSONA', pick: 'companion persona', rate: 'sense of timing', chips: ['Boyfriend', 'Big Brother', 'Loyal Pup', 'Roguish', 'Yandere', 'Restrained'] },
     'Synthetic Voice & AI': { label: 'AI TRACK', pick: 'AI track', rate: 'model-craft', chips: ['Voice Clone', 'AI Art', 'AI Writing', 'Prompt-craft', 'Fine-tuning', 'Automation'] },
-    'Script & Dramaturgy': { label: 'GENRE', pick: 'genre specialty', rate: 'penmanship', chips: ['Second-Chance', 'Mutual Pining', 'Marriage-First', 'Slice-of-Life', 'Period', 'Fantasy'] },
+    'Script & Dramaturgy': { label: 'GENRE', pick: 'genre specialty', rate: 'penmanship', chips: ['Female-Led', 'Dirty Talk', 'Devoted Pup', 'All-Rounder', 'Omegaverse', 'Power Couple', 'Younger Man', 'Master Tease'] },
     'Visual Design': { label: 'VISUAL STYLE', pick: 'visual style', rate: 'taste', chips: ['Cold & Austere', 'Dark', 'Crisp', 'Rich & Lush', 'Minimal', 'Retro Film'] },
     'Operations & Engagement': { label: 'OPS SPECIALTY', pick: 'ops specialty', rate: 'playbook', chips: ['Topic Picking', 'Tag Alchemy', 'Growth', 'Comment-craft', 'Compliance', 'Private Community'] },
     'Theory & Appreciation': { label: 'RESEARCH FOCUS', pick: 'research focus', rate: 'connoisseurship', chips: ['Close-Reading', 'Ship-ology', 'Cross-Cultural', 'Sonic Aesthetics', 'Psychoanalysis', 'Deep Lore'] }
