@@ -18,6 +18,13 @@ const J = (data, status = 200) =>
   });
 const s = (v, n) => String(v == null ? '' : v).slice(0, n);
 
+// IP 单向哈希（不存原始 IP，仅用于防刷分桶）
+async function hashIp(ip) {
+  if (!ip) return '0';
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('sa_salt_v1|' + ip));
+  return Array.from(new Uint8Array(buf)).slice(0, 8).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function handleApi(request, env, url) {
   if (request.method === 'OPTIONS') return new Response(null, { headers: CORS });
   if (!env.DB) return J({ error: 'db unbound' }, 500);
@@ -29,10 +36,19 @@ async function handleApi(request, env, url) {
       return J(r ? r.n : 0);
     }
     if (p === '/api/gen') {
+      const anon = s(body.anon_id, 80);
+      const ipHash = await hashIp(request.headers.get('CF-Connecting-IP') || '');
+      // 轻防刷：同一浏览器 60s ≤15 次；同一 IP 60s ≤100 次（阈值偏高，避免误伤 CGNAT 共享 IP 的真人）。
+      // 命中时返回 429 不入库 → 前端仍出图、只是该次不计入「在册学员」。
+      const since = "created_at > strftime('%Y-%m-%dT%H:%M:%SZ','now','-60 seconds')";
+      const a = await env.DB.prepare('SELECT COUNT(*) AS n FROM generations WHERE anon_id=? AND ' + since).bind(anon).first();
+      if (a && a.n >= 15) return J({ error: 'rate' }, 429);
+      const ipc = await env.DB.prepare('SELECT COUNT(*) AS n FROM generations WHERE ip_hash=? AND ' + since).bind(ipHash).first();
+      if (ipc && ipc.n >= 100) return J({ error: 'rate' }, 429);
       const house = body.house ? s(body.house, 8) : null;
       const r = await env.DB
-        .prepare('INSERT INTO generations (kind, anon_id, house) VALUES (?,?,?) RETURNING id')
-        .bind(s(body.kind || 'gen', 40), s(body.anon_id, 80), house)
+        .prepare('INSERT INTO generations (kind, anon_id, house, ip_hash) VALUES (?,?,?,?) RETURNING id')
+        .bind(s(body.kind || 'gen', 40), anon, house, ipHash)
         .first();
       let house_rank = null;
       if (house) {
