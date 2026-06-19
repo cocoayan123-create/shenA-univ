@@ -1,6 +1,6 @@
 {
   "courses": [
-    { "id": "c1", "code": "INTRO·101", "title": "男喘通识 · 开课先导", "x_link": "", "summary": "开宗明义：男喘是什么、为什么是女性向、这门系到底学什么、怎么学。先把地图铺开。", "status": "upcoming" },
+    { "id": "c1", "code": "INTRO·101", "title": "男喘通识 · 开课先导", "x_link": "https://x.com/AlbertKwongonly/status/2067945704501473352", "summary": "开宗明义：男喘是什么、为什么是女性向、这门系到底学什么、怎么学。开学首课 · X 直播开讲，先把地图为你铺开。", "status": "open" },
     { "id": "c2", "code": "BRTH·201", "title": "男喘气息训练 & 发声训练", "x_link": "", "summary": "气息支撑与发声基本功——男喘的地基。从胸腹联合呼吸，到声线与气音的混合。", "status": "upcoming" },
     { "id": "c3", "code": "REC·210", "title": "气声实录实操", "x_link": "", "summary": "实录流的临场感：第一人称、呼吸、节奏，以及怎么把『真实感』录得有设计感。", "status": "upcoming" },
     { "id": "c4", "code": "DRAM·220", "title": "剧情类录制实操", "x_link": "", "summary": "把台本演成关系：规定情境、情绪弧光、对手戏与即兴。", "status": "upcoming" },
