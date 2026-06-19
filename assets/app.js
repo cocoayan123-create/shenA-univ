@@ -74,6 +74,19 @@
     if(sv)sv.addEventListener('click',function(){if(!done){run();}if(done)saveCard(root.querySelector('.dorm'),I.sortFile||'深A女性向大学-分院结果.png',{kind:'sorting',house:lastHouse,serialEl:root.querySelector('[data-dorm=no]'),fmt:function(s){return (I.stuPre||'深A · 第 ')+Number(s).toLocaleString()+(I.stuSuf||' 位学员');},houseEl:root.querySelector('[data-dorm=hrank]'),houseFmt:function(n){return lastHouseName+(I.rankMid||' · 第 ')+Number(n).toLocaleString()+(I.rankSuf||' 名');}});});
   }
 
+  /* ---------- 各系对应的能力自评轴（非男喘不应填声线，按系切换技能维度） ---------- */
+  var DEPT_SKILLS={
+    '男喘系':{label:'声线类型自评',pick:'声线',rate:'气息功底',chips:['清冷','低哑','温润','痞坏','奶狗','病娇']},
+    'ASMR声控系':{label:'声控风格自评',pick:'声控风格',rate:'助眠功力',chips:['耳语','气声','啵啵音','掏耳','摸头杀','颅内酥']},
+    '声音工程系':{label:'技术工种自评',pick:'技术路线',rate:'技术硬度',chips:['录音','混音','降噪','母带','配乐','拟音']},
+    '实时陪伴系':{label:'陪伴人设自评',pick:'陪伴人设',rate:'临场分寸',chips:['男友感','兄长','忠犬','痞帅','病娇','禁欲系']},
+    'AI系':{label:'AI 路线自评',pick:'AI 流派',rate:'炼丹功力',chips:['声音克隆','AI绘图','AI写文','调教Prompt','模型微调','自动化']},
+    '台本创作系':{label:'擅长题材自评',pick:'擅长题材',rate:'笔力',chips:['破镜重圆','双向奔赴','先婚后爱','沉浸日常','古风','西幻']},
+    '视觉设计系':{label:'视觉风格自评',pick:'视觉风格',rate:'审美功底',chips:['冷淡禁欲','暗黑','清冷','高级浓郁','极简','复古胶片']},
+    '运营系':{label:'运营专长自评',pick:'运营专长',rate:'操盘力',chips:['精准选题','标签玄学','涨粉','控评','合规','私域']},
+    '理论鉴赏系':{label:'研究方向自评',pick:'研究方向',rate:'鉴赏功力',chips:['拉片','嗑学','跨文化','声音美学','心理分析','考据癖']}
+  };
+
   /* ---------- 入学申请书（叙事体，选项嵌进正文） ---------- */
   function initApply(root){
     var card=root.querySelector('.gen-card');
@@ -83,14 +96,25 @@
     nick.addEventListener('input',pushNick);
     var st=root.querySelector('[data-in=statement]');
     if(st)st.addEventListener('input',function(){var v=(st.value||'').trim();var e=root.querySelector('[data-f=statement]');if(e)e.textContent=v?((I.statePre||'自述 ｜ ')+v):'';});
-    wirePills(root,'dept',function(v){setF('dept',v);});
-    wirePills(root,'tone',function(v){setF('tone',v);});
+    var SKILLS=I.deptSkills||DEPT_SKILLS;
+    var skillLab=root.querySelector('[data-skill-label]'),skillPills=root.querySelector('[data-skill-pills]'),rateLab=root.querySelector('[data-rate-label]');
+    function wireTone(){root.querySelectorAll('[data-group="tone"]').forEach(function(p){p.addEventListener('click',function(){root.querySelectorAll('[data-group="tone"]').forEach(function(x){x.classList.remove('on');});p.classList.add('on');setF('tone',p.textContent.trim());});});}
+    function applyDept(v){
+      setF('dept',v);
+      var sk=SKILLS[v];if(!sk){for(var k in SKILLS){sk=SKILLS[k];break;}}
+      setF('pickword',sk.pick);setF('rateword',sk.rate);
+      if(skillLab)skillLab.textContent=sk.label;
+      if(rateLab)rateLab.textContent=sk.rate;
+      if(skillPills){skillPills.innerHTML=sk.chips.map(function(c){return '<span class="ap-chip" data-group="tone">'+String(c).replace(/&/g,'&amp;')+'</span>';}).join('');wireTone();}
+      setF('tone',I.toneDefault||'　　');
+    }
+    wirePills(root,'dept',applyDept);
     var stars=root.querySelectorAll('.ap-ctl .star');
     stars.forEach(function(s,i){s.addEventListener('click',function(){
       stars.forEach(function(x,j){x.classList.toggle('on',j<=i);});
       var n=i+1;setF('stars','★★★★★'.slice(0,n)+'☆☆☆☆☆'.slice(0,5-n));
     });});
-    setF('dept',I.deptDefault||'男喘系');setF('tone',I.toneDefault||'　　');setF('stars','☆☆☆☆☆');pushNick();
+    applyDept(I.deptDefault||'男喘系');setF('stars','☆☆☆☆☆');pushNick();
     root.querySelector('[data-save]').addEventListener('click',function(){
       if(!(nick.value||'').trim()){alert(I.applyNickAlert||'先填上你的昵称，再生成申请书');nick.focus();return;}
       saveCard(card,I.applyFile||'深A女性向大学-入学申请书.png',{kind:'apply',serialEl:root.querySelector('[data-no]'),fmt:function(s){return 'No. SA·MMXXVI·'+pad(s);}});
@@ -100,7 +124,7 @@
       nick.value='';if(st)st.value='';
       root.querySelectorAll('.ap-ctl .on').forEach(function(e){e.classList.remove('on');});
       var d0=root.querySelector('.ap-ctl [data-group=dept]');if(d0)d0.classList.add('on');
-      setF('dept',I.deptDefault||'男喘系');setF('tone',I.toneDefault||'　　');setF('stars','☆☆☆☆☆');setF('statement','');pushNick();
+      applyDept(I.deptDefault||'男喘系');setF('stars','☆☆☆☆☆');setF('statement','');pushNick();
     });
   }
 
