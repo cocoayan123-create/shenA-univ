@@ -23,7 +23,7 @@
     var canShare=!!(navigator.canShare&&file&&navigator.canShare({files:[file]}));
     var o=document.createElement('div');
     o.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(24,15,38,.93);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px;overflow:auto;-webkit-overflow-scrolling:touch;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif';
-    o.innerHTML='<div style="color:#e7d9b6;font-size:13px;letter-spacing:.03em;text-align:center;max-width:360px;margin:10px 0 12px;line-height:1.7">'+(t.tip||'长按图片 · 保存到相册，再发微信/朋友圈即可正常预览（电脑端点下方下载）')+'</div>'+
+    o.innerHTML='<div style="color:#e7d9b6;font-size:13px;letter-spacing:.03em;text-align:center;max-width:360px;margin:10px 0 12px;line-height:1.7">'+(t.tip||'长按图片 · 保存到相册（电脑端点下方下载）')+'</div>'+
       '<img src="'+dataURL+'" style="max-width:100%;width:auto;max-height:68vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:block" alt="">'+
       '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 8px">'+
         (canShare?'<button class="btn btn-gold" id="sa-share"><i class="ti ti-share"></i> '+(t.share||'分享 / 存图')+'</button>':'')+
