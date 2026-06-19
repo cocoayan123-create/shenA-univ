@@ -16,6 +16,28 @@
 
   /* ---------- 存图（生成 +1，序号回填到卡片） ---------- */
   function pad(n){n=String(n);while(n.length<5)n='0'+n;return n;}
+  /* 出图结果弹层：显示大图 → 引导长按存相册（微信内联预览的正确姿势）+ 原生分享 + 下载兜底 */
+  function showResult(dataURL,blob,filename){
+    var t=I.save||{};
+    var file=null;try{if(blob)file=new File([blob],filename,{type:'image/png'});}catch(e){}
+    var canShare=!!(navigator.canShare&&file&&navigator.canShare({files:[file]}));
+    var o=document.createElement('div');
+    o.style.cssText='position:fixed;inset:0;z-index:9998;background:rgba(24,15,38,.93);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px;overflow:auto;-webkit-overflow-scrolling:touch;font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif';
+    o.innerHTML='<div style="color:#e7d9b6;font-size:13px;letter-spacing:.03em;text-align:center;max-width:360px;margin:10px 0 12px;line-height:1.7">'+(t.tip||'长按图片 · 保存到相册，再发微信/朋友圈即可正常预览（电脑端点下方下载）')+'</div>'+
+      '<img src="'+dataURL+'" style="max-width:100%;width:auto;max-height:68vh;border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.5);display:block" alt="">'+
+      '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 8px">'+
+        (canShare?'<button class="btn btn-gold" id="sa-share"><i class="ti ti-share"></i> '+(t.share||'分享 / 存图')+'</button>':'')+
+        '<a class="btn btn-purple" download="'+filename+'" href="'+dataURL+'"><i class="ti ti-download"></i> '+(t.download||'下载')+'</a>'+
+        '<button class="btn btn-ghost" id="sa-close" style="color:#e7d9b6;border-color:#8a7fa0">'+(t.close||'关闭')+'</button>'+
+      '</div>';
+    document.body.appendChild(o);
+    var html=document.documentElement;html.style.overflow='hidden';
+    function close(){if(o.parentNode)o.parentNode.removeChild(o);html.style.overflow='';}
+    o.querySelector('#sa-close').addEventListener('click',close);
+    o.addEventListener('click',function(e){if(e.target===o)close();});
+    var sh=o.querySelector('#sa-share');
+    if(sh)sh.addEventListener('click',function(){try{navigator.share({files:[file],title:'深A女性向大学'})['catch'](function(){});}catch(e){}});
+  }
   function saveCard(card,filename,opts){
     if(typeof html2canvas==='undefined'){alert(I.libLoading||'图片库还在加载，稍等再点');return;}
     function shoot(){
@@ -23,8 +45,9 @@
       var bg=getComputedStyle(card).backgroundColor||'#F5F1EA';
       html2canvas(card,{scale:2,backgroundColor:bg,useCORS:true,logging:false}).then(function(cv){
         card.classList.remove('shoot');
-        var a=document.createElement('a');a.download=filename;a.href=cv.toDataURL('image/png');a.click();
         try{localStorage.setItem('sa_gen','1');}catch(e){}
+        var url=cv.toDataURL('image/png');
+        if(cv.toBlob){cv.toBlob(function(b){showResult(url,b,filename);},'image/png');}else{showResult(url,null,filename);}
       }).catch(function(){card.classList.remove('shoot');alert(I.genFail||'生成失败，再试一次');});
     }
     if(opts&&opts.kind&&window.SAGen){

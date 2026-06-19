@@ -18,6 +18,7 @@ window.SA_I18N = {
   rankMid: ' · No. ', rankSuf: '',
   age: { title: 'Adults Only (18+)', body: 'This site contains women&rsquo;s-oriented adult audio material and is intended only for visitors aged 18 or older. By entering you confirm that you are at least 18.', yes: 'I am 18 or older · Enter', no: 'Leave' },
   nickOpen: '', nickClose: '', quoteOpen: '“', quoteClose: '”',
+  save: { tip: 'Press and hold the image to save it to your Photos, then share it anywhere as a real photo. On desktop, right-click or hit Download.', share: 'Share / Save', download: 'Download', close: 'Close' },
   crest: { '火': 'F', '土': 'E', '风': 'A', '水': 'W' },
   deptSkills: {
     'Masculine Breath Studies': { label: 'VOCAL REGISTER', pick: 'vocal register', rate: 'breath control', chips: ['Low & Husky', 'Puppy', 'Roguish', 'Young Man', 'Boyish', 'Older Man', 'Restrained', 'Cracking'] },
