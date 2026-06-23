@@ -185,10 +185,22 @@
     }).catch(function(){});
   }
 
+  /* 有开课的系自动排到院系区最前（稳定排序） */
+  function sortOpenDepts(){
+    var grid=document.querySelector('.dept-grid');if(!grid)return;
+    var cards=[].slice.call(grid.querySelectorAll('[data-dept]'));if(!cards.length)return;
+    loadCourses().then(function(cs){
+      var open={};cs.forEach(function(c){if(isLive(c)&&c.dept)open[c.dept]=1;});
+      var opened=[],rest=[];
+      cards.forEach(function(c){(open[c.getAttribute('data-dept')]?opened:rest).push(c);});
+      opened.concat(rest).forEach(function(c){grid.appendChild(c);});
+    }).catch(function(){});
+  }
   document.addEventListener('DOMContentLoaded',function(){
     ageGate();
     var nt=document.querySelector('.nav-toggle'),nm=document.querySelector('nav.main');
     if(nt&&nm)nt.addEventListener('click',function(){var o=nm.classList.toggle('open');nt.setAttribute('aria-expanded',o?'true':'false');});
+    sortOpenDepts();
     livePoll(fillEnrolled);
     var list=document.getElementById('course-list');if(list)renderList(list);
     var root=document.getElementById('course-root');if(root)renderDetail(root);
