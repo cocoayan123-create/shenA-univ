@@ -39,6 +39,15 @@
 .crs-cm-body{font-family:var(--sans);font-size:14px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
 .crs-cm-date{font-family:var(--mono,monospace);font-size:11px;color:var(--muted);margin-top:3px}
 .crs-cm-empty{font-family:var(--sans);font-size:13px;color:var(--muted);padding:10px 0}
+.crs-notes{background:#fbf9f4;border:.5px solid #e6dcc8;border-left:3px solid var(--primary);border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px;margin:18px 0}
+.crs-note-sec{margin:12px 0}
+.crs-note-sec h4{font-family:var(--sans);font-size:13.5px;color:var(--primary);margin:0 0 6px;font-weight:600;letter-spacing:.02em}
+.crs-note-sec ul{margin:0;padding-left:18px}
+.crs-note-sec li{font-family:var(--sans);font-size:13.5px;line-height:1.85;color:#4a4358;margin-bottom:5px}
+.crs-quotes{margin-top:14px;border-top:.5px dashed #e0d7c8;padding-top:13px}
+.crs-quotes blockquote{margin:0 0 11px;font-family:Georgia,'Songti SC',serif;font-size:14.5px;line-height:1.8;color:var(--ink);border-left:2px solid var(--accent);padding-left:12px}
+.crs-quotes blockquote:last-child{margin-bottom:0}
+.crs-notes-src{font-family:var(--sans);font-size:11px;color:var(--muted);margin-top:11px;letter-spacing:.04em}
 .crs-upcoming{font-family:var(--sans);font-size:14px;color:#6b6478;background:#f3f0e8;border-radius:var(--radius);padding:16px 18px;margin:18px 0}
 .crs-upcoming .ti{color:var(--accent);vertical-align:-2px}
 

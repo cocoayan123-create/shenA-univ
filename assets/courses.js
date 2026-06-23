@@ -97,6 +97,12 @@
       h+='<div class="crs-d-code">'+esc(c.code)+'</div><h1 class="crs-d-title">'+esc(c.title)+'</h1>';
       h+=live?'<span class="crs-badge live">开课中</span>':'<span class="crs-badge">待开课</span>';
       h+='<div class="crs-sum"><div class="crs-sum-h"><i class="ti ti-sparkles"></i> AI 总结</div><p>'+esc(c.summary)+'</p></div>';
+      if(c.outline&&c.outline.length){
+        h+='<div class="crs-notes"><div class="crs-sum-h"><i class="ti ti-notebook"></i> 课程讲义 · 鉴赏笔记</div>';
+        c.outline.forEach(function(sec){h+='<div class="crs-note-sec"><h4>'+esc(sec.h)+'</h4><ul>'+(sec.items||[]).map(function(it){return '<li>'+esc(it)+'</li>';}).join('')+'</ul></div>';});
+        if(c.quotes&&c.quotes.length)h+='<div class="crs-quotes">'+c.quotes.map(function(q){return '<blockquote>「'+esc(q)+'」</blockquote>';}).join('')+'</div>';
+        h+='<div class="crs-notes-src">据课程音频整理 · 仅作鉴赏笔记，完整内容见 X 录播</div></div>';
+      }
       if(live){
         h+='<a class="btn btn-purple crs-d-link" href="'+esc(c.x_link)+'" target="_blank" rel="noopener"><i class="ti ti-brand-x"></i> 去 X 看完整课程 <i class="ti ti-external-link"></i></a>';
         h+='<div class="crs-inter"><div data-ck></div><div data-rate></div></div>';
