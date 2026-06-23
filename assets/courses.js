@@ -54,10 +54,13 @@
 
   function loadCourses(){return fetch('/content/courses.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(d){return (d&&d.courses)||[];});}
   function isLive(c){return !!(c.x_link&&String(c.x_link).trim());}
+  var DEPT_PAGE={'男喘系':'men-chuan.html','理论鉴赏系':'lilun.html'};
 
   /* ---------- 列表（男喘系页） ---------- */
   function renderList(el){
+    var dept=el.getAttribute('data-dept');
     loadCourses().then(function(cs){
+      if(dept)cs=cs.filter(function(c){return c.dept===dept;});
       el.innerHTML=cs.map(function(c){
         var live=isLive(c);
         return '<a class="crs-card'+(live?' live':'')+'" href="course.html?id='+encodeURIComponent(c.id)+'">'+
@@ -86,7 +89,10 @@
     loadCourses().then(function(cs){
       var c=null;for(var i=0;i<cs.length;i++){if(cs[i].id===id){c=cs[i];break;}}
       if(!c){root.innerHTML='<p style="color:var(--muted)">课程不存在。<a href="men-chuan.html">返回男喘系</a></p>';return;}
-      document.title=c.title+' · 男喘系 · 深A女性向大学';
+      var dn=c.dept||'男喘系',dp=DEPT_PAGE[dn]||'men-chuan.html';
+      document.title=c.title+' · '+dn+' · 深A女性向大学';
+      var bc=document.querySelector('.bc');if(bc)bc.textContent='院系 ／ '+dn+' ／ 课程';
+      var back=document.querySelector('[data-course-back]');if(back){back.setAttribute('href',dp);back.innerHTML='<i class="ti ti-arrow-left"></i> 返回'+dn;}
       var live=isLive(c),h='';
       h+='<div class="crs-d-code">'+esc(c.code)+'</div><h1 class="crs-d-title">'+esc(c.title)+'</h1>';
       h+=live?'<span class="crs-badge live">开课中</span>':'<span class="crs-badge">待开课</span>';
